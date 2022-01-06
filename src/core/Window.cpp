@@ -1,33 +1,48 @@
-#include "MGN/SetupGLFW.h"
+#include "core/Window.h"
+#include "core/Input.h"
 
-#include <iostream>
-
-void MGN::SetupGLFW::initialize(){
-     // glfw: initialize
-     if(!glfwInit())
-        printf("Failed to initialize GLFW.");
-}
-
-void MGN::SetupGLFW::configure(){
-    // glfw: configure
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
-    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-}
-
-GLFWwindow* MGN::SetupGLFW::createWindow(unsigned int width, unsigned int height, const char* title){
-    // glfw window creation
-    // --------------------
-    GLFWwindow* window = glfwCreateWindow(width, height, title, NULL, NULL);
-    if (window == NULL){
-        std::cout << "Failed to create GLFW window" << std::endl;
-        glfwTerminate();
+namespace MGN {
+    void Window::installMainCallbacks(){
+        if(nativeWindow != nullptr){
+            glfwSetKeyCallback(nativeWindow, Input::keyCallback);
+			glfwSetCursorPosCallback(nativeWindow, Input::mouseCallback);
+			glfwSetMouseButtonCallback(nativeWindow, Input::mouseButtonCallback);
+        }
     }
 
-    return window;
-}
+    void Window::close(){
+        if(nativeWindow != nullptr){
+            glfwSetWindowShouldClose(nativeWindow, GLFW_TRUE);
+        }
+    }
 
-void MGN::SetupGLFW::centerWindow(GLFWwindow* window){
+    Window* Window::createWindow(int width, int height, const char* title, bool fullScreenMode){
+        glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
+		glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
+		glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+
+        // Only supply the monitor if we want to start the window in full-screen mode
+		Window* res = new Window();
+		GLFWmonitor* primaryMonitor = fullScreenMode ? glfwGetPrimaryMonitor() : nullptr;
+		res->nativeWindow = glfwCreateWindow(width, height, title, primaryMonitor, nullptr);
+		if (res->nativeWindow == nullptr){
+			printf("Failed to create GLFW window\n");
+			glfwTerminate();
+			return nullptr;
+		}
+		glfwMakeContextCurrent(res->nativeWindow);
+
+		return res;
+    }
+
+    void Window::freeWindow(Window* window){
+        if(window){
+            glfwDestroyWindow(window->nativeWindow);
+            delete window;
+        }
+    }
+
+    void Window::centerWindow(GLFWwindow* window){
     // Get window position and size
     int window_x, window_y;
     glfwGetWindowPos(window, &window_x, &window_y);
@@ -89,4 +104,6 @@ void MGN::SetupGLFW::centerWindow(GLFWwindow* window){
         // Set the window position to the center of the owner monitor
         glfwSetWindowPos(window, owner_x + (owner_width * 0.5) - window_width, owner_y + (owner_height * 0.5) - window_height);
     }
+}
+
 }

@@ -9,16 +9,19 @@
 				"-fdiagnostics-color=always",
 				"-g",
                 "-std=c++17",
-    		    "-I${workspaceFolder}/include",
-		        "-L${workspaceFolder}/lib",				
-		        "${workspaceFolder}/src/\\*.cpp",				
+				"-I${workspaceFolder}/include**",
+				"-I${workspaceFolder}/vendor**",
+		        "-L${workspaceFolder}/lib",	
+		        "${workspaceFolder}/src/\\*.cpp",
+				"${workspaceFolder}/src/core\\*.cpp",
+				"${workspaceFolder}/src/renderer\\*.cpp",		
 		        "${workspaceFolder}/src/glad.c",
                 "-lglfw3dll",
                 "-o",
 				"${workspaceFolder}\\build\\MGN.exe"
 			],
 			"options": {
-				"cwd": "${fileDirname}"
+				"cwd": "${workspaceFolder}"
 			},
 			"problemMatcher": [
 				"$gcc"
