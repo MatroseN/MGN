@@ -70,6 +70,57 @@ void destroyChallenge1()
 }
 
 // =============================================================
+// Drawtest
+// =============================================================
+static std::array<Vertex, 4> testSquare = {
+	//      Color                         Position
+	Vertex{{0.11f, 0.8f, 0.76f, 1.0f},   {-0.9f,-0.9f, 0.0f}},
+	Vertex{{0.1f,  0.9f, 0.12f, 1.0f},   {-0.9f, 0.9f, 0.0f}},
+	Vertex{{0.12f, 0.9f, 0.1f,  1.0f},   {0.9f,  0.9f, 0.0f}},
+	Vertex{{0.12f, 0.1f, 0.9f,  1.0f},   {0.9f, -0.9f, 0.0f}}
+};
+
+static uint32 testSquareElements[6] = {
+	0, 2, 3,
+	0, 1, 2
+};
+
+static uint32 testSquareVao;
+static uint32 testSquareVbo;
+static uint32 testSquareEbo;
+
+void setupTestSquare(){
+	glCreateVertexArrays(1, &testSquareVao);
+	glBindVertexArray(testSquareVao);
+
+	glGenBuffers(1, &testSquareVbo);
+	glBindBuffer(GL_ARRAY_BUFFER, testSquareVbo);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(testSquare), testSquare.data(), GL_STATIC_DRAW);
+
+	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, color));
+	glEnableVertexAttribArray(0);
+
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, position));
+	glEnableVertexAttribArray(1);
+
+	glGenBuffers(1, &testSquareEbo);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, testSquareEbo);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(testSquareElements), testSquareElements, GL_STATIC_DRAW);
+}
+
+void drawTestSquare(){
+	glBindVertexArray(testSquareVao);
+	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+}
+
+void destroyTestSquare()
+{
+	glDeleteBuffers(1, &testSquareVbo);
+	glDeleteBuffers(1, &testSquareEbo);
+	glDeleteVertexArrays(1, &testSquareVao);
+}
+
+// =============================================================
 // Challenge 2 Solution
 // =============================================================
 static std::array<Vertex, 4> challenge2Square = {
@@ -340,14 +391,14 @@ int main(){
 		glClear(GL_COLOR_BUFFER_BIT);
 
 		if (Input::isKeyDown(GLFW_KEY_ESCAPE)){
-			destroyChallenge5();
+			destroyTestSquare();
 			Window::freeWindow(window);
 			glfwTerminate();
 			return 0;
 		}
 
-		setupChallenge5();
-		drawChallenge5();
+		setupTestSquare();
+		drawTestSquare();
 
 		glfwSwapBuffers(window->nativeWindow);
 		glfwPollEvents();
