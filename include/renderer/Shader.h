@@ -3,10 +3,21 @@
 #include "core/core.h"
 
 namespace MGN {
-    struct Shader {
-        uint32 programId;
+    enum class ShaderType : uint8
+	{
+		Vertex,
+		Fragment,
+	};
 
-		void bind();
-		void compile();
-    };
+	struct Shader
+	{
+		char* filepath;
+		uint32 shaderId;
+		ShaderType type;
+
+		bool compile(ShaderType type, const char* shaderFilepath);
+		void destroy();
+
+		static GLenum toGlShaderType(ShaderType type);
+	};
 }
